@@ -1,0 +1,15 @@
+﻿{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=DESKTOP-AUL1S01;Database=Test01;User Id=pll;Password=myposadminauthentication;"
+  },
+  "EmailConfiguration": {
+    "SenderEmail": "retail.workflow@cargillsceylon.com",
+    "SenderPassword": "C@R9$reTA!"
+  },
+  "LogfilePath": {
+    "logfilepath": "E:\\C# Project\\Interface\\Log\\log.txt"
+  },
+  "DatabaseConfiguration": {
+    "databasename": "myPOS_DB_SL"
+  }
+}
