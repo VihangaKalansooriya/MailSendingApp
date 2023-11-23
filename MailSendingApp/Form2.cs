@@ -20,13 +20,16 @@ namespace MailSendingApp
             InitializeComponent();
             InitializeButtonDesign();
             mailAppInstance = new mailApp();
+
             DataGridViewCheckBoxColumn checkBoxColumn = new DataGridViewCheckBoxColumn
             {
-                HeaderText = "SELECT", 
+                HeaderText = "Select", 
                 Name = "Select",
             };
+
             dataGridView1.Columns.Insert(0, checkBoxColumn); 
             dataGridView1.AllowUserToAddRows = false;
+            dateTimePicker.MaxDate = DateTime.Now;
 
             try
             {
@@ -65,24 +68,18 @@ namespace MailSendingApp
                 dataGridView1.ColumnHeadersDefaultCellStyle = headerStyle;
 
                 dataGridView1.Columns["TB_ID"].HeaderText = "ID";
-                dataGridView1.Columns["TB_RECEIVERMAIL"].HeaderText = "RECEIVER EMAIL";
-                dataGridView1.Columns["TB_LOCATION"].HeaderText = "LOCATION";
-                dataGridView1.Columns["TB_TYPE"].HeaderText = "TYPE";
-                dataGridView1.Columns["TB_RUNNO"].HeaderText = "REPORT NUMBER";
+                dataGridView1.Columns["TB_RECEIVERMAIL"].HeaderText = "Receiver Email";
+                dataGridView1.Columns["TB_LOCATION"].HeaderText = "Location";
+                dataGridView1.Columns["TB_TYPE"].HeaderText = "Type";
+                dataGridView1.Columns["TB_RUNNO"].HeaderText = "Report Number";
 
                 dataGridView1.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
-                Logger.LogError("Error in Form2 :", ex);
+                Logger.LogError("Error in :", ex);
             }
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
         }
 
         private void Form2_Load(object sender, EventArgs e)
@@ -92,7 +89,7 @@ namespace MailSendingApp
 
         }
 
-        private void pictureBox1_Click(object sender, EventArgs e)
+        private void closeimg_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
@@ -105,21 +102,24 @@ namespace MailSendingApp
                 btn_deselectall.Enabled = false;
                 btn_selectall.Enabled = false;
                 btn_refresh.Enabled = false;
+                
+
                 foreach (DataGridViewRow row in dataGridView1.Rows)
                 {
                     DataGridViewCheckBoxCell checkBoxCell = row.Cells["Select"] as DataGridViewCheckBoxCell;
                     if (checkBoxCell != null && (bool)checkBoxCell.EditedFormattedValue)
                     {
-                        int id = Convert.ToInt32(row.Cells["TB_ID"].Value);
-                        string recipientEmail = row.Cells["TB_RECEIVERMAIL"].Value.ToString();
-                       
-                        await mailAppInstance.ProcessEmailAsync(recipientEmail, id);
-                        btn_send.Enabled = true;
-                        btn_deselectall.Enabled = true;
-                        btn_selectall.Enabled = true;
-                        btn_refresh.Enabled=true;
+                         int id = Convert.ToInt32(row.Cells["TB_ID"].Value);
+                         string recipientEmail = row.Cells["TB_RECEIVERMAIL"].Value.ToString();
+
+                         await mailAppInstance.ProcessEmailAsync(recipientEmail, id);
                     }
                 }
+
+                btn_send.Enabled = true;
+                btn_deselectall.Enabled = true;
+                btn_selectall.Enabled = true;
+                btn_refresh.Enabled = true;
             }
             catch (Exception ex)
             {
@@ -139,7 +139,7 @@ namespace MailSendingApp
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void btn_refresh_Click(object sender, EventArgs e)
         {
             try
             {
@@ -148,6 +148,10 @@ namespace MailSendingApp
                     connection.Open();
 
                     string query = "SELECT TB_ID, TB_RECEIVERMAIL, TB_LOCATION, TB_TYPE, TB_RUNNO FROM TB_MAILDETAILS WHERE TB_STATUS=0";
+                    dateTimePicker.Value = DateTime.Now.Date;
+                    send_RB.Checked = false;
+                    Unsend_RB.Checked = false;
+                    receiver_txt.Text = string.Empty;
 
                     using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
@@ -157,7 +161,7 @@ namespace MailSendingApp
                             adapter.Fill(dataTable);
 
                             dataGridView1.DataSource = dataTable;
-                            dateTimePicker1.Value = DateTime.Now.Date;
+                            dateTimePicker.Value = DateTime.Now.Date;
                         }
                     }
                 }
@@ -171,7 +175,7 @@ namespace MailSendingApp
 
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
-            DateTime selectedDate = dateTimePicker1.Value.Date; 
+            DateTime selectedDate = dateTimePicker.Value.Date; 
 
             try
             {
@@ -181,7 +185,7 @@ namespace MailSendingApp
                
                     string query = "SELECT TB_ID, TB_RECEIVERMAIL, TB_LOCATION, TB_TYPE, TB_RUNNO " +
                                    "FROM TB_MAILDETAILS " +
-                                   "WHERE TB_STATUS = 0 AND CONVERT(DATE, TB_DATE) = @SelectedDate";
+                                   "WHERE CONVERT(DATE, TB_DATE) = @SelectedDate";
 
                     using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
@@ -199,12 +203,11 @@ namespace MailSendingApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
                 Logger.LogError("Unhandled exception in the application", ex);
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btn_selectall_Click(object sender, EventArgs e)
         {
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
@@ -215,5 +218,62 @@ namespace MailSendingApp
                 }
             }
         }
+
+        private void btn_search_Click(object sender, EventArgs e)
+        {
+            string searchText = receiver_txt.Text.Trim();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(Globalconfig.ConnectionString))
+                {
+                    connection.Open();
+
+                    string query = "SELECT TB_ID, TB_RECEIVERMAIL, TB_LOCATION, TB_TYPE, TB_RUNNO " +
+                                   "FROM TB_MAILDETAILS " +
+                                   "WHERE TB_STATUS = @Status AND TB_RECEIVERMAIL LIKE @SearchText " +
+                                   "AND CONVERT(DATE, TB_DATE) = @SelectedDate";
+
+                    using (SqlCommand cmd = new SqlCommand(query, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@SearchText", "%" + searchText + "%");
+
+                        if (send_RB.Checked)
+                        {
+                            cmd.Parameters.AddWithValue("@Status", 1); 
+                        }
+                        else if (Unsend_RB.Checked)
+                        {
+                            cmd.Parameters.AddWithValue("@Status", 0); 
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@Status", 0); 
+                        }
+
+                        cmd.Parameters.AddWithValue("@SelectedDate", dateTimePicker.Value.Date);
+
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                        {
+                            DataTable dataTable = new DataTable();
+                            adapter.Fill(dataTable);
+
+                            dataGridView1.DataSource = dataTable;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Unhandled exception in the application", ex);
+            }
+        }
+
+        private void minimizeimg_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
     }
+
 }
