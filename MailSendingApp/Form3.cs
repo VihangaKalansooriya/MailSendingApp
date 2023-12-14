@@ -20,6 +20,11 @@ namespace MailSendingApp
             timer.Interval = 3000; 
             timer.Tick += Timer_Tick;
             timer.Start();
+
+            retaillable.Parent = mainimg;
+            retaillable.BackColor = Color.Transparent;
+            version.Parent = mainimg;
+            version.BackColor = Color.Transparent;
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -30,6 +35,7 @@ namespace MailSendingApp
         {
            
         }
+ 
 
     }
 }

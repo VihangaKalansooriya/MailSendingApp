@@ -37,7 +37,7 @@ namespace MailSendingApp
                 {
                     connection.Open();
 
-                    string query = "SELECT TB_ID, TB_RECEIVERMAIL, TB_LOCATION, TB_TYPE, TB_RUNNO FROM TB_MAILDETAILS WHERE TB_STATUS=0";
+                    string query = "SELECT TB_ID, TB_RECEIVERMAIL, TB_LOCATION, TB_DESC, TB_RUNNO FROM M_TBLMAILDETAILS WHERE TB_STATUS=0";
 
                     using (SqlCommand cmd = new SqlCommand(query, connection))
                     {
@@ -70,8 +70,14 @@ namespace MailSendingApp
                 dataGridView1.Columns["TB_ID"].HeaderText = "ID";
                 dataGridView1.Columns["TB_RECEIVERMAIL"].HeaderText = "Receiver Email";
                 dataGridView1.Columns["TB_LOCATION"].HeaderText = "Location";
-                dataGridView1.Columns["TB_TYPE"].HeaderText = "Type";
+                dataGridView1.Columns["TB_DESC"].HeaderText = "Type";
                 dataGridView1.Columns["TB_RUNNO"].HeaderText = "Report Number";
+
+                dataGridView1.Columns["TB_ID"].Width = 50; 
+                dataGridView1.Columns["TB_RECEIVERMAIL"].Width = 200;
+                dataGridView1.Columns["TB_LOCATION"].Width = 100;
+                dataGridView1.Columns["TB_DESC"].Width = 200;
+                dataGridView1.Columns["TB_RUNNO"].Width = 120;
 
                 dataGridView1.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 
@@ -147,7 +153,7 @@ namespace MailSendingApp
                 {
                     connection.Open();
 
-                    string query = "SELECT TB_ID, TB_RECEIVERMAIL, TB_LOCATION, TB_TYPE, TB_RUNNO FROM TB_MAILDETAILS WHERE TB_STATUS=0";
+                    string query = "SELECT TB_ID, TB_RECEIVERMAIL, TB_LOCATION, TB_TYPE, TB_RUNNO FROM M_TBLMAILDETAILS WHERE TB_STATUS=0";
                     dateTimePicker.Value = DateTime.Now.Date;
                     send_RB.Checked = false;
                     Unsend_RB.Checked = false;
@@ -184,7 +190,7 @@ namespace MailSendingApp
                     connection.Open();
                
                     string query = "SELECT TB_ID, TB_RECEIVERMAIL, TB_LOCATION, TB_TYPE, TB_RUNNO " +
-                                   "FROM TB_MAILDETAILS " +
+                                   "FROM M_TBLMAILDETAILS " +
                                    "WHERE CONVERT(DATE, TB_DATE) = @SelectedDate";
 
                     using (SqlCommand cmd = new SqlCommand(query, connection))
@@ -230,7 +236,7 @@ namespace MailSendingApp
                     connection.Open();
 
                     string query = "SELECT TB_ID, TB_RECEIVERMAIL, TB_LOCATION, TB_TYPE, TB_RUNNO " +
-                                   "FROM TB_MAILDETAILS " +
+                                   "FROM M_TBLMAILDETAILS " +
                                    "WHERE TB_STATUS = @Status AND TB_RECEIVERMAIL LIKE @SearchText " +
                                    "AND CONVERT(DATE, TB_DATE) = @SelectedDate";
 

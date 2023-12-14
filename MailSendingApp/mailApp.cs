@@ -24,6 +24,7 @@ public class mailApp
     {
         try
         {
+            MailMessage mail = null;
             SmtpClient smtpClient = new SmtpClient("smtp.office365.com")
             {
                 Port = 587,
@@ -36,13 +37,13 @@ public class mailApp
             using (SqlConnection dbConnection = new SqlConnection(Globalconfig.ConnectionString))
             {
                 dbConnection.Open();
-                string query = "SELECT TB_TYPE, TB_RUNNO FROM TB_MAILDETAILS WHERE TB_ID = @ID";
+                string query = "SELECT TB_TYPE, TB_RUNNO, TB_TRTYPE FROM M_TBLMAILDETAILS WHERE TB_ID = @ID";
 
                 using (SqlCommand command = new SqlCommand(query, dbConnection))
                 {
                     command.Parameters.AddWithValue("@ID", id);
                     using (SqlDataReader reader = command.ExecuteReader())
-                    {
+                    { 
                         if (reader.Read())
                         {
                             argsval.Add("reportName", "transaction");
@@ -50,15 +51,28 @@ public class mailApp
                             argsval.Add("code", reader["TB_RUNNO"].ToString());
                             argsval.Add("menuCode", reader["TB_TYPE"].ToString());
                             argsval.Add("db", Globalconfig.databasename);
+
+                            string trType = reader["TB_TRTYPE"].ToString();
+                            if (trType == "T")
+                            {
+                                mail = new MailMessage(Globalconfig.SenderEmail, recipientEmail)
+                                {
+                                    Subject = $"{argsval["menuCode"]} Report Attached.",
+                                    Body = $"Dear Sir/Madam,\nI trust this message finds you well. Attached is the {argsval["menuCode"]} report. for ID {id} (Type: {trType})\nThank You."
+                                };
+                            }
+                            else if (trType == "P")
+                            {
+                                mail = new MailMessage(Globalconfig.SenderEmail, recipientEmail)
+                                {
+                                    Subject = $" Request for Permission {argsval["menuCode"]} Report",
+                                    Body = $"Dear Sir/Madam,\nI hope this email finds you well. I'm writing to request permission for {argsval["menuCode"]} report. for ID {id} (Type: {trType}). Attached are the relevant or document. Your prompt approval would be highly appreciated.\nThank You."
+                                };
+                            }
                         }
                     }
                 }
             }
-            MailMessage mail = new MailMessage(Globalconfig.SenderEmail, recipientEmail)
-            {
-                Subject = $"{argsval["menuCode"]} Report",
-                Body = $"Dear Sir/Madam,\nThis email contains a {argsval["menuCode"]} PDF attachment for ID {id}\nThank You."
-            };
 
             var startInfo = new ProcessStartInfo
             {
@@ -105,7 +119,7 @@ public class mailApp
 
     static void UpdateStatus(int id)
     {
-        string updateQuery = "UPDATE TB_MAILDETAILS SET TB_STATUS = 1 WHERE TB_ID = @ID";
+        string updateQuery = "UPDATE M_TBLMAILDETAILS SET TB_STATUS = 1 WHERE TB_ID = @ID";
         
         using (SqlConnection con = new SqlConnection(Globalconfig.ConnectionString))
         {

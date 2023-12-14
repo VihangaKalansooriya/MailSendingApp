@@ -51,20 +51,22 @@ namespace MailSendingApp
             // retaillable
             // 
             this.retaillable.AutoSize = true;
-            this.retaillable.BackColor = System.Drawing.Color.White;
-            this.retaillable.Location = new System.Drawing.Point(8, 299);
+            this.retaillable.BackColor = System.Drawing.Color.Transparent;
+            this.retaillable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.retaillable.Location = new System.Drawing.Point(7, 299);
             this.retaillable.Name = "retaillable";
-            this.retaillable.Size = new System.Drawing.Size(152, 13);
+            this.retaillable.Size = new System.Drawing.Size(248, 13);
             this.retaillable.TabIndex = 1;
-            this.retaillable.Text = "©24x7 Retail Solutions Pvt Ltd";
+            this.retaillable.Text = "Copyright (c)-24x7 Retail Solutions Pvt Ltd";
             // 
             // version
             // 
             this.version.AutoSize = true;
-            this.version.BackColor = System.Drawing.Color.MintCream;
-            this.version.Location = new System.Drawing.Point(402, 299);
+            this.version.BackColor = System.Drawing.Color.Transparent;
+            this.version.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.version.Location = new System.Drawing.Point(396, 300);
             this.version.Name = "version";
-            this.version.Size = new System.Drawing.Size(41, 13);
+            this.version.Size = new System.Drawing.Size(48, 13);
             this.version.TabIndex = 2;
             this.version.Text = "V 1.0.0";
             // 
